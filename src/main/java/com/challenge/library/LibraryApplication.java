@@ -25,6 +25,6 @@ public class LibraryApplication implements CommandLineRunner {
 	public void run(String... args) {
 		log.info("DataSource: " + dataSource.toString());
 		final JdbcTemplate restTemplate = new JdbcTemplate(dataSource);
-		restTemplate.execute(("select 1"));
+		restTemplate.execute("select 1");
 	}
 }
