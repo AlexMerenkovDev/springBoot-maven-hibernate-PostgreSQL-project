@@ -1,9 +1,10 @@
-package com.challenge.library.dao;
+package com.challenge.library.dao.impl;
 
-import com.challenge.library.dao.impl.BookDAOImpl;
+import com.challenge.library.TestDataUtil;
 import com.challenge.library.domain.Book;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,11 +24,7 @@ public class BookDaoImplTests {
 
     @Test
     public void testThatCreateBookGeneratesCorrectSql (){
-        Book book = Book.builder()
-                .isbn("abcd")
-                .title("Jin Book")
-                .author_id(1L)
-                .build();
+        Book book = TestDataUtil.createTestBookA();
 
         this.underTest.create(book);
 
@@ -35,5 +32,24 @@ public class BookDaoImplTests {
                 eq("abcd"),
                 eq("Jin Book"),
                 eq(1L));
+    }
+
+    @Test
+    public void testThatReadOneGeneratesCorrectSql() {
+        this.underTest.findOne("516484");
+        verify(jdbcTemplate).query(
+                eq("SELECT isbn, title, author_id FROM books WHERE isbn = ? LIMIT 1"),
+                ArgumentMatchers.<BookDAOImpl.BookRowMapper>any(),
+                eq("516484")
+                );
+    }
+
+    @Test
+    public void testThatReadAllGeneratesCorrectSql(){
+        this.underTest.findAll();
+        verify(jdbcTemplate).query(
+                eq("SELECT isbn, title, author_id FROM books"),
+                ArgumentMatchers.<BookDAOImpl.BookRowMapper>any()
+        );
     }
 }

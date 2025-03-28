@@ -1,9 +1,10 @@
-package com.challenge.library.dao;
+package com.challenge.library.dao.impl;
 
-import com.challenge.library.dao.impl.AuthorDAOImpl;
+import com.challenge.library.TestDataUtil;
 import com.challenge.library.domain.Author;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,11 +24,7 @@ public class AuthorDaoImplTests {
 
     @Test
     public void testThatCreateAuthorGeneratesCorrectSql(){
-        Author author = Author.builder()
-                .id(1L)
-                .name("Alex Merenkovas")
-                .age(27)
-                .build();
+        Author author = TestDataUtil.createTestAuthorA();
 
         underTest.create(author);
 
@@ -35,5 +32,25 @@ public class AuthorDaoImplTests {
                 eq("INSERT INTO authors (id, name, age) VALUES (?, ?, ?)"),
                 eq(1L), eq("Alex Merenkovas"), eq(27)
         );
+    }
+
+    @Test
+    public void testThatFindOneGeneratesCorrectSql(){
+        underTest.findOne(1L);
+
+        verify(jdbcTemplate).query(
+                eq("SELECT id, name, age FROM authors WHERE id = ? LIMIT 1"),
+                ArgumentMatchers.<AuthorDAOImpl.AuthorRowMapper>any(),
+                eq(1L)
+                );
+    }
+
+    @Test
+    public void testThatFindAllGeneratesCorrectSql(){
+        underTest.findAll();
+        verify(jdbcTemplate).query(
+                eq("SELECT id, name, age FROM authors"),
+                ArgumentMatchers.<AuthorDAOImpl.AuthorRowMapper>any()
+                );
     }
 }
